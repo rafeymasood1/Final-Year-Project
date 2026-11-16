@@ -1,0 +1,350 @@
+"""Dydact's front end: a round "D" button docked bottom-right, just above the taskbar.
+
+Click the D and a small menu opens with three options:
+    Course mode   (placeholder page for now)
+    Query mode    the text box: type a target name or a plain-words request and press Enter;
+                  the box emits `submitted(str)`. Results are shown with
+                  `set_status(text, kind)` where kind is "info", "ok" or "error".
+    Settings      capture options (see `settings_changed`)
+
+The "-" button in a page's header folds it back into the D button (nothing is lost: the guide
+keeps running and the page comes back with the same text and status).
+"""
+
+from __future__ import annotations
+
+from PySide6.QtCore import QStringListModel, Qt, Signal, Slot
+from PySide6.QtGui import QKeySequence, QShortcut
+from PySide6.QtWidgets import (
+    QCheckBox,
+    QCompleter,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QSpinBox,
+    QVBoxLayout,
+    QWidget,
+)
+
+from ..overlay.overlay import ACCENT
+
+MARGIN = 12  # logical px between the box and the screen / taskbar edge
+LOGO = 52  # diameter of the D button
+MENU_W = 210
+PANEL_W = 380
+CARD_PAD = 12  # inner padding of the page card (left/right)
+
+TITLES = {
+    "query": "What do you want to do?",
+    "course": "Course mode",
+    "settings": "Settings",
+}
+
+STYLE = f"""
+QFrame#panel {{
+    background: rgba(24, 24, 32, 240);
+    border: 1px solid {ACCENT.name()};
+    border-radius: 10px;
+}}
+QLabel {{ color: #E6E6F0; font: 10pt "Segoe UI"; }}
+QLabel#title {{ font: 600 10pt "Segoe UI"; }}
+QLabel#note {{ color: #9A9AB0; font: 9pt "Segoe UI"; }}
+QLabel#status[kind="ok"] {{ color: #7EE787; }}
+QLabel#status[kind="error"] {{ color: #FF7B72; }}
+QLineEdit {{
+    background: #2A2A36; color: white; font: 11pt "Segoe UI";
+    border: 1px solid #44445A; border-radius: 6px; padding: 5px 8px;
+}}
+QLineEdit:focus {{ border-color: {ACCENT.name()}; }}
+QSpinBox {{
+    background: #2A2A36; color: white; font: 10pt "Segoe UI";
+    border: 1px solid #44445A; border-radius: 6px; padding: 3px 6px;
+}}
+QSpinBox:disabled {{ color: #6A6A80; }}
+QCheckBox {{ color: #E6E6F0; font: 10pt "Segoe UI"; spacing: 8px; }}
+QCheckBox:disabled {{ color: #6A6A80; }}
+QPushButton {{
+    background: transparent; color: #9A9AB0; border: none; font: 11pt "Segoe UI";
+}}
+QPushButton:hover {{ color: white; }}
+QPushButton#logo {{
+    color: white; font: 700 20pt "Segoe UI";
+    border: 2px solid rgba(255, 255, 255, 70); border-radius: {LOGO // 2}px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #9B7CFF, stop:1 #5E3FE0);
+}}
+QPushButton#logo:hover {{
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #B197FF, stop:1 #7656F0);
+}}
+QPushButton#item {{
+    text-align: left; color: #E6E6F0; font: 10.5pt "Segoe UI";
+    padding: 9px 12px; border-radius: 6px;
+}}
+QPushButton#item:hover {{ background: rgba(124, 92, 255, 80); color: white; }}
+QPushButton#item[active="true"] {{ color: {ACCENT.lighter(130).name()}; font-weight: 600; }}
+"""
+
+
+class PromptBox(QWidget):
+    submitted = Signal(str)  # text typed in query mode
+    closed = Signal()  # the X button
+    mode_changed = Signal(str)  # "query" | "course" | "settings"
+    settings_changed = Signal(bool, int)  # fast_capture, hide_delay_ms
+
+    def __init__(self, screen, suggestions: list[str] = (), width: int = PANEL_W):
+        super().__init__()
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setStyleSheet(STYLE)
+        self._screen = screen
+        self._panel_w = width
+        self._mode: str | None = None
+        self._menu_buttons: dict[str, QPushButton] = {}
+        self._pages: dict[str, QWidget] = {}
+        self._wrapped: list[
+            QLabel
+        ] = []  # word-wrapped labels whose height we set explicitly
+
+        # ---- the D button (always visible)
+        self.logo = QPushButton(
+            "D", objectName="logo", toolTip="Dydact", cursor=Qt.PointingHandCursor
+        )
+        self.logo.setFixedSize(LOGO, LOGO)
+        self.logo.clicked.connect(self.toggle_menu)
+
+        # ---- the 3-option menu
+        self.menu = QFrame(objectName="panel")
+        self.menu.setFixedWidth(MENU_W)
+        mlay = QVBoxLayout(self.menu)
+        mlay.setContentsMargins(6, 6, 6, 6)
+        mlay.setSpacing(2)
+        for key, label in (
+            ("course", "Course mode"),
+            ("query", "Query mode"),
+            ("settings", "Settings"),
+        ):
+            b = QPushButton(label, objectName="item", cursor=Qt.PointingHandCursor)
+            b.clicked.connect(lambda _=False, k=key: self.show_mode(k))
+            mlay.addWidget(b)
+            self._menu_buttons[key] = b
+        self.menu.hide()
+
+        # ---- the page card: header + one page per mode
+        self.card = QFrame(objectName="panel")
+        self.card.setFixedWidth(width)
+        self.title = QLabel("", objectName="title")
+        mini = QPushButton(
+            "–", toolTip="Fold back into the D button", cursor=Qt.PointingHandCursor
+        )
+        close = QPushButton("✕", toolTip="Quit Dydact", cursor=Qt.PointingHandCursor)
+        mini.clicked.connect(self.minimize)
+        close.clicked.connect(self.closed)
+        head = QHBoxLayout()
+        head.addWidget(self.title)
+        head.addStretch()
+        head.addWidget(mini)
+        head.addWidget(close)
+
+        clay = QVBoxLayout(self.card)
+        clay.setContentsMargins(12, 8, 12, 12)
+        clay.setSpacing(8)
+        clay.addLayout(head)
+        for key, page in (
+            ("query", self._build_query(suggestions)),
+            ("course", self._build_course()),
+            ("settings", self._build_settings()),
+        ):
+            self._pages[key] = page
+            clay.addWidget(page)
+            page.hide()
+        self.card.hide()
+
+        root = QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(8)
+        root.addWidget(self.card, 0, Qt.AlignRight)
+        root.addWidget(self.menu, 0, Qt.AlignRight)
+        root.addWidget(self.logo, 0, Qt.AlignRight)
+
+        self.esc_pressed = QShortcut(QKeySequence(Qt.Key_Escape), self).activated
+        screen.availableGeometryChanged.connect(self.dock)  # taskbar moved / resized
+        self._fit()
+
+    # ---- pages ----
+    def _build_query(self, suggestions) -> QWidget:
+        page = QWidget()
+        lay = QVBoxLayout(page)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(8)
+        self.input = QLineEdit(placeholderText="Type a target, e.g. pen   (Esc clears)")
+        self.input.returnPressed.connect(self._submit)
+        completer = QCompleter(QStringListModel(list(suggestions)), self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setFilterMode(Qt.MatchContains)
+        self.input.setCompleter(completer)
+        self.status = QLabel("", objectName="status", wordWrap=True)
+        self.status.hide()
+        self._wrapped.append(self.status)
+        lay.addWidget(self.input)
+        lay.addWidget(self.status)
+        return page
+
+    def _build_course(self) -> QWidget:
+        page = QWidget()
+        lay = QVBoxLayout(page)
+        lay.setContentsMargins(0, 0, 0, 0)
+        note = QLabel(
+            "Guided lessons will live here. Not built yet - use Query mode for now.",
+            objectName="note",
+            wordWrap=True,
+        )
+        self._wrapped.append(note)
+        lay.addWidget(note)
+        return page
+
+    def _build_settings(self) -> QWidget:
+        page = QWidget()
+        lay = QVBoxLayout(page)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(8)
+        self.fast = QCheckBox("Fast capture")
+        self.fast.setEnabled(False)
+        self.fast_note = QLabel(
+            "Hides Dydact from screenshots, so no hide-and-wait is needed.",
+            objectName="note",
+            wordWrap=True,
+        )
+        self._wrapped.append(self.fast_note)
+        self.delay = QSpinBox()
+        self.delay.setRange(0, 1000)
+        self.delay.setSingleStep(25)
+        self.delay.setValue(150)
+        self.delay.setSuffix(" ms")
+        row = QHBoxLayout()
+        row.addWidget(QLabel("Hide delay"))
+        row.addStretch()
+        row.addWidget(self.delay)
+        self.fast.toggled.connect(self._emit_settings)
+        self.delay.valueChanged.connect(self._emit_settings)
+        lay.addWidget(self.fast)
+        lay.addWidget(self.fast_note)
+        lay.addLayout(row)
+        return page
+
+    # ---- menu / modes ----
+    @Slot()
+    def toggle_menu(self):
+        self.menu.setVisible(self.menu.isHidden())
+        self._fit()
+
+    @Slot(str)
+    def show_mode(self, mode: str):
+        self._mode = mode
+        self.menu.hide()
+        for k, page in self._pages.items():
+            page.setVisible(k == mode)
+        for k, b in self._menu_buttons.items():
+            b.setProperty("active", k == mode)
+            b.style().unpolish(b)
+            b.style().polish(b)
+        self.title.setText(TITLES[mode])
+        self.card.show()
+        self._fit()
+        if mode == "query":
+            self.activateWindow()
+            self.input.setFocus()
+        self.mode_changed.emit(mode)
+
+    @Slot()
+    def minimize(self):
+        """Fold the page and menu away; only the D button stays."""
+        self.card.hide()
+        self.menu.hide()
+        self._mode = None
+        for b in self._menu_buttons.values():
+            b.setProperty("active", False)
+            b.style().unpolish(b)
+            b.style().polish(b)
+        self._fit()
+
+    @property
+    def mode(self) -> str | None:
+        return self._mode
+
+    # ---- placement ----
+    def _fit(self):
+        if not self.card.isHidden():
+            w = self._panel_w
+        elif not self.menu.isHidden():
+            w = MENU_W
+        else:
+            w = LOGO
+        self.setFixedWidth(w)
+        self.dock()
+
+    def _wrap_labels(self):
+        """A word-wrapped QLabel inside a fixed-width window reports a one-line height until it is
+        laid out, so adjustSize() clipped long text. Give each label the height its text really
+        needs at the card's inner width."""
+        inner = self._panel_w - 2 * CARD_PAD - 2  # minus the card border
+        for lbl in self._wrapped:
+            lbl.ensurePolished()  # use the stylesheet's font, not the default
+            lbl.setFixedHeight(lbl.heightForWidth(inner) if lbl.text() else 0)
+
+    @Slot()
+    def dock(self):
+        """Bottom-right of the screen's work area (= above the taskbar)."""
+        self._wrap_labels()
+        if self.layout() is not None:
+            self.layout().activate()
+        self.adjustSize()
+        area = self._screen.availableGeometry()
+        x = area.right() - self.width() - MARGIN + 1
+        y = area.bottom() - self.height() - MARGIN + 1
+        self.move(
+            max(area.left(), x), max(area.top(), y)
+        )  # never push the top off-screen
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        self.dock()
+        if self._mode == "query":
+            self.activateWindow()
+            self.input.setFocus()
+
+    # ---- state (used by main.Guide) ----
+    def set_status(self, text: str, kind: str = "info"):
+        self.status.setText(text)
+        self.status.setProperty("kind", kind)
+        self.status.style().unpolish(self.status)  # re-apply the [kind=...] rule
+        self.status.style().polish(self.status)
+        self.status.setVisible(bool(text))
+        self.dock()  # height may have changed: stay above taskbar
+
+    def set_busy(self, busy: bool):
+        self.input.setReadOnly(busy)
+
+    def set_fast_capture_available(self, ok: bool):
+        """main.py calls this once Windows has (or hasn't) excluded our windows from capture."""
+        self.fast.blockSignals(True)
+        self.fast.setEnabled(ok)
+        self.fast.setChecked(ok)
+        self.fast.blockSignals(False)
+        self.fast_note.setText(
+            "Hides Dydact from screenshots, so no hide-and-wait is needed."
+            if ok
+            else "Not available on this system - the hide delay below is used instead."
+        )
+        self.dock()
+        self._emit_settings()
+
+    def _emit_settings(self, *_):
+        fast = self.fast.isEnabled() and self.fast.isChecked()
+        self.delay.setEnabled(not fast)
+        self.settings_changed.emit(fast, self.delay.value())
+
+    def _submit(self):
+        text = self.input.text().strip()
+        if text and not self.input.isReadOnly():
+            self.submitted.emit(text)

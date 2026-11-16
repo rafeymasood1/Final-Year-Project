@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+data/progress.json
+tools/menu_tree.crawled.txt
+tools/properties.crawled.json
+tools/illustrator-shortcuts.crawled.txt

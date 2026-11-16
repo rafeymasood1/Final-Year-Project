@@ -1,0 +1,9 @@
+PySide6
+pynput
+mss
+numpy
+opencv-python
+rapidocr
+onnxruntime
+uiautomation
+pyyaml

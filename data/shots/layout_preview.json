@@ -1,0 +1,34 @@
+{
+  "status": "Canvas unknown: searching full visible app",
+  "canvases": [],
+  "preserved": [
+    [
+      1835,
+      -1,
+      30,
+      30
+    ],
+    [
+      1863,
+      -1,
+      30,
+      30
+    ],
+    [
+      1891,
+      -1,
+      30,
+      30
+    ]
+  ],
+  "search_regions": [
+    [
+      0,
+      0,
+      1920,
+      1042
+    ]
+  ],
+  "search_pixels": 2000640,
+  "probe_error": ""
+}

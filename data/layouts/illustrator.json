@@ -1,0 +1,56 @@
+{
+  "processes": [
+    "illustrator.exe"
+  ],
+  "canvas_selectors": [
+    {
+      "control_type": "DocumentControl"
+    }
+  ],
+  "preserve_selectors": [
+    {
+      "control_type": "ToolBarControl"
+    },
+    {
+      "control_type": "MenuControl"
+    },
+    {
+      "control_type": "ButtonControl"
+    },
+    {
+      "control_type": "ComboBoxControl"
+    },
+    {
+      "control_type": "TabControl"
+    },
+    {
+      "control_type": "NativeWindow",
+      "class_name": "Edit|OWL\\.Toolbar|OWL\\.ToolbarContainer|OWL\\.MenuBar"
+    }
+  ],
+  "minimum_canvas_fraction": 0.08,
+  "canvas_inset_px": 12,
+  "refresh_seconds": 3,
+  "manual_canvas_regions": [],
+  "canvas_viewport_rules": [
+    {
+      "container": {
+        "control_type": "NativeWindow",
+        "class_name": "OWL\\.Document"
+      },
+      "view": {
+        "control_type": "NativeWindow",
+        "class_name": "DroverLord - Window Class"
+      }
+    }
+  ],
+  "embedded_toolbars": {
+    "background_values": [
+      50,
+      83,
+      184,
+      255
+    ],
+    "max_height": 100
+  }
+}

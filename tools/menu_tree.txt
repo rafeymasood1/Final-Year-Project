@@ -1,0 +1,551 @@
+# Illustrator menu tree.  Source of truth for the "menus" section of data/contexts.json.
+#
+# Format: one item per line, indent = 2 spaces per level.
+#     Label | Shortcut | flags | description        (everything after Label is optional)
+#   flags:  s = needs a selection      - = does NOT need one (Object/Effect default to "needs")
+#   "Hide Edges|Show Edges" = the wording flips with app state; either alternative matches.
+#   A line with children is a submenu; only leaf commands become nodes in contexts.json.
+#
+# Pre-filled from knowledge of Illustrator (Windows, 2024-2026). It is NOT verified against your
+# copy: run  python tools/crawl_menus.py  to read the real menus, then
+#                  python tools/build_contexts.py tools/menu_tree.crawled.txt
+# (descriptions/flags you wrote here are kept when the crawl is merged in).
+
+File
+  New... | Ctrl+N | | Creates a new document.
+  New from Template... | Shift+Ctrl+N
+  Open... | Ctrl+O | | Opens an existing file.
+  Browse in Bridge... | Alt+Ctrl+O
+  Close | Ctrl+W | | Closes the current document.
+  Close All | Alt+Ctrl+W
+  Save | Ctrl+S | | Saves the document.
+  Save As... | Shift+Ctrl+S | | Saves under a new name or format.
+  Save a Copy... | Alt+Ctrl+S | | Saves a copy and keeps working on the original.
+  Save as Template...
+  Save Selected Slices...
+  Revert | F12 | | Returns to the last saved version.
+  Search Adobe Stock...
+  Place... | Shift+Ctrl+P | | Imports an image or file into the document.
+  Save for Microsoft Office...
+  Export
+    Export As... | | | Exports artwork as PNG, JPG, SVG, etc.
+    Export for Screens... | Alt+Ctrl+E | | Exports artboards/assets at several sizes and formats.
+    Save for Web (Legacy)... | Alt+Shift+Ctrl+S
+    Export Selection... | | s
+  Package... | Alt+Shift+Ctrl+P | | Collects the file with its fonts and linked images.
+  Scripts
+    Other Script... | Ctrl+F12
+  Document Setup... | Alt+Ctrl+P | | Changes artboard size, units and bleed.
+  Document Color Mode
+    CMYK Color | | | Print colour mode.
+    RGB Color | | | Screen colour mode.
+  File Info... | Alt+Shift+Ctrl+I
+  Print... | Ctrl+P
+  Exit | Ctrl+Q
+
+Edit
+  Undo | Ctrl+Z | | Undoes the last action.
+  Redo | Shift+Ctrl+Z | | Redoes what was undone.
+  Cut | Ctrl+X | s
+  Copy | Ctrl+C | s
+  Paste | Ctrl+V
+  Paste in Front | Ctrl+F | | Pastes directly above the selection, same position.
+  Paste in Back | Ctrl+B | | Pastes directly below the selection, same position.
+  Paste in Place | Shift+Ctrl+V | | Pastes at the exact position it was copied from.
+  Paste on All Artboards | Alt+Shift+Ctrl+V
+  Paste without Formatting | Alt+Ctrl+V
+  Clear | | s
+  Find and Replace...
+  Find Next
+  Check Spelling... | Ctrl+I
+  Edit Custom Dictionary...
+  Edit Colors
+    Recolor Artwork... | | s | Changes the colours of the selected artwork.
+    Recolor with Preset
+    Adjust Color Balance... | | s
+    Blend Front to Back | | s
+    Blend Horizontally | | s
+    Blend Vertically | | s
+    Convert to CMYK | | s
+    Convert to Grayscale | | s
+    Convert to RGB | | s
+    Invert Colors | | s
+    Overprint Black... | | s
+    Saturate... | | s
+  Edit Original | | s
+  Transparency Flattener Presets...
+  Tracing Presets...
+  Print Presets...
+  Adobe PDF Presets...
+  Perspective Grid Presets...
+  Color Settings... | Shift+Ctrl+K
+  Assign Profile...
+  Keyboard Shortcuts... | Alt+Shift+Ctrl+K
+  Preferences
+    General... | Ctrl+K
+    Selection & Anchor Display...
+    Type...
+    Units...
+    Guides & Grid...
+    Smart Guides...
+    Slices...
+    Hyphenation...
+    Plug-ins & Scratch Disks...
+    User Interface...
+    Performance...
+    File Handling...
+    Clipboard Handling...
+    Appearance of Black...
+
+Object
+  Transform
+    Again | Ctrl+D | | Repeats the last move/rotate/scale.
+    Move... | Shift+Ctrl+M | | Moves the selection by an exact distance.
+    Rotate... | | | Rotates the selection by an exact angle.
+    Reflect... | | | Mirrors the selection across an axis.
+    Scale... | | | Scales the selection by an exact percentage.
+    Shear... | | | Slants the selection.
+    Transform Each... | Alt+Shift+Ctrl+D | | Transforms each selected object around its own centre.
+    Reset Bounding Box
+  Arrange
+    Bring to Front | Shift+Ctrl+] | | Moves the selection to the top of the stack.
+    Bring Forward | Ctrl+] | | Moves the selection up one level.
+    Send Backward | Ctrl+[ | | Moves the selection down one level.
+    Send to Back | Shift+Ctrl+[ | | Moves the selection to the bottom of the stack.
+    Send to Current Layer
+  Group | Ctrl+G | | Groups the selected objects.
+  Ungroup | Shift+Ctrl+G | | Ungroups the selected group.
+  Ungroup All | Alt+Shift+G
+  Lock
+    Selection | Ctrl+2 | | Locks the selected objects so they can't be edited.
+    All Artwork Above
+    Other Layers
+  Unlock All | Alt+Ctrl+2 | -
+  Hide
+    Selection | Ctrl+3 | | Hides the selected objects.
+    All Artwork Above
+    Other Layers
+  Show All | Alt+Ctrl+3 | -
+  Expand... | | | Converts strokes, fills, and effects into editable shapes.
+  Expand Appearance
+  Crop Image
+  Rasterize... | | | Turns vector artwork into pixels.
+  Create Gradient Mesh...
+  Create Object Mosaic...
+  Flatten Transparency...
+  Make Pixel Perfect
+  Slice
+    Make
+    Release
+    Create from Guides | | -
+    Create from Selection
+    Duplicate
+    Combine
+    Delete All | | -
+    Slice Options...
+    Clip to Artboard | | -
+  Create Trim Marks
+  Path
+    Join | Ctrl+J | | Joins two endpoints into one path.
+    Average | Alt+Ctrl+J
+    Outline Stroke | | | Turns a stroke into a filled shape.
+    Offset Path... | | | Creates a copy of the path offset by a set distance.
+    Reverse Path Direction
+    Simplify... | | | Reduces the number of anchor points.
+    Add Anchor Points
+    Remove Anchor Points
+    Divide Objects Below
+    Split Into Grid...
+    Clean Up...
+  Shape
+    Expand Shape
+  Pattern
+    Make | | | Turns the selection into a repeating pattern.
+    Edit Pattern
+    Tile Edge Color...
+  Repeat
+    Radial
+    Grid
+    Mirror
+    Release
+    Options...
+  Blend
+    Make | Alt+Ctrl+B | | Creates intermediate shapes between two objects.
+    Release | Alt+Shift+Ctrl+B
+    Blend Options...
+    Expand
+    Replace Spine
+    Reverse Spine
+    Reverse Front to Back
+  Envelope Distort
+    Make with Warp... | Alt+Shift+Ctrl+W
+    Make with Mesh... | Alt+Ctrl+M
+    Make with Top Object | Alt+Ctrl+C
+    Release
+    Envelope Options...
+    Expand
+    Edit Contents
+  Perspective
+    Attach to Active Plane
+    Release with Perspective
+    Move Plane to Match Object
+    Edit Text
+  Live Paint
+    Make | Alt+Ctrl+X
+    Merge
+    Release
+    Gap Options...
+    Expand
+  Image Trace
+    Make | | | Converts a raster image into vector shapes.
+    Make and Expand
+    Release
+    Tracing Options...
+    Expand
+  Text Wrap
+    Make
+    Release
+    Text Wrap Options...
+  Clipping Mask
+    Make | Ctrl+7 | | Uses the top object as a mask for the others.
+    Release | Alt+Ctrl+7
+    Edit Mask
+  Compound Path
+    Make | Ctrl+8 | | Combines paths into one compound path (holes cut out).
+    Release | Alt+Shift+Ctrl+8
+  Artboards
+    Convert to Artboards | | -
+    Rearrange... | | -
+    Fit to Artwork Bounds | | -
+    Fit to Selected Art | | s
+  Graph
+    Type...
+    Data...
+    Design...
+    Column...
+    Marker...
+  Collect For Export
+    As Single Asset
+    As Multiple Assets
+
+Type
+  Glyphs
+  Area Type Options... | | s
+  Type on a Path
+    Rainbow | | s
+    3D Ribbon | | s
+    Skew | | s
+    Stair Step | | s
+    Gravity | | s
+    Type on a Path Options... | | s
+  Threaded Text
+    Create
+    Release Selection
+    Remove Threading
+  Fit Headline | | s
+  Create Outlines | Shift+Ctrl+O | s | Converts text into editable vector shapes.
+  Find Font...
+  Change Case
+    UPPERCASE | | s
+    lowercase | | s
+    Title Case | | s
+    Sentence case | | s
+  Smart Punctuation...
+  Optical Margin Alignment | | s
+  Insert Special Character
+    Hyphens and Dashes
+    Quotation Marks
+    Other Symbols
+  Insert White Space Character
+    Em Space
+    En Space
+    Thin Space
+  Insert Break Character
+    Discretionary Line Break
+    Column Break
+  Fill with Placeholder Text
+  Show Hidden Characters | Alt+Ctrl+I
+  Type Orientation
+    Horizontal | | s
+    Vertical | | s
+  Legacy Text
+    Update All Legacy Text
+
+Select
+  All | Ctrl+A | | Selects every object on the artboard.
+  All on Active Artboard | Alt+Ctrl+A
+  Deselect | Shift+Ctrl+A | | Clears the selection.
+  Reselect | Ctrl+6
+  Inverse | | s
+  Next Object Above | Alt+Ctrl+] | s
+  Next Object Below | Alt+Ctrl+[ | s
+  Same
+    Appearance | | s
+    Appearance Attribute | | s
+    Blending Mode | | s
+    Fill & Stroke | | s
+    Fill Color | | s
+    Opacity | | s
+    Stroke Color | | s
+    Stroke Weight | | s
+    Graphic Style | | s
+    Symbol Instance | | s
+    Link Block Series | | s
+    Font Family | | s
+    Font Family Style | | s
+    Font Size | | s
+    Text Fill Color | | s
+    Text Stroke Color | | s
+  Object
+    All on Same Layers
+    Direction Handles
+    Brush Strokes
+    Clipping Masks
+    Stray Points
+    Text Objects
+  Save Selection...
+  Edit Selection...
+
+Effect
+  Apply Last Effect | Shift+Ctrl+E
+  Last Effect | Alt+Shift+Ctrl+E
+  Document Raster Effects Settings... | | -
+  Effect Gallery... | | -
+  3D and Materials
+    3D (Classic)
+      Extrude & Bevel...
+      Revolve...
+      Rotate...
+  Convert to Shape
+    Rectangle...
+    Rounded Rectangle...
+    Ellipse...
+  Crop Marks
+  Distort & Transform
+    Free Distort...
+    Pucker & Bloat... | | | Pulls anchor points in or out to make petal or star shapes.
+    Roughen...
+    Tweak...
+    Transform... | | | Moves, scales, rotates or copies with a live effect.
+    Twist...
+    Zig Zag... | | | Makes wavy or zig-zag edges.
+  Path
+    Offset Path...
+    Outline Object
+    Outline Stroke
+  Pathfinder
+    Add
+    Intersect
+    Exclude
+    Subtract
+    Minus Back
+    Divide
+    Trim
+    Merge
+    Crop
+    Outline
+    Hard Mix
+    Soft Mix...
+    Trap...
+  Rasterize...
+  Stylize
+    Drop Shadow... | | | Adds a drop shadow to the selection.
+    Feather...
+    Inner Glow...
+    Outer Glow...
+    Round Corners... | | | Rounds all corners of a shape with a live effect.
+    Scribble... | | | Gives artwork a hand-drawn scribble look.
+  SVG Filters
+    Apply SVG Filter...
+    Import SVG Filter...
+  Warp
+    Arc...
+    Arc Lower...
+    Arc Upper...
+    Arch...
+    Bulge...
+    Shell Lower...
+    Shell Upper...
+    Flag...
+    Wave...
+    Fish...
+    Rise...
+    Fisheye...
+    Inflate...
+    Squeeze...
+    Twist...
+  Artistic
+    Colored Pencil...
+    Cutout...
+    Dry Brush...
+    Film Grain...
+    Fresco...
+    Neon Glow...
+    Paint Daubs...
+    Palette Knife...
+    Plastic Wrap...
+    Poster Edges...
+    Rough Pastels...
+    Smudge Stick...
+    Sponge...
+    Underpainting...
+    Watercolor...
+  Blur
+    Gaussian Blur... | | | Softly blurs the selection.
+    Radial Blur...
+    Smart Blur...
+  Brush Strokes
+    Accented Edges...
+    Angled Strokes...
+    Crosshatch...
+    Dark Strokes...
+    Ink Outlines...
+    Spatter...
+    Sprayed Strokes...
+    Sumi-e...
+  Distort
+    Diffuse Glow...
+    Glass...
+    Ocean Ripple...
+  Pixelate
+    Color Halftone...
+    Crystallize...
+    Mezzotint...
+    Pointillize...
+  Texture
+    Craquelure...
+    Grain...
+    Mosaic Tiles...
+    Patchwork...
+    Stained Glass...
+    Texturizer...
+  Video
+    De-Interlace...
+    NTSC Colors
+
+View
+  Outline|Preview | Ctrl+Y | | Shows artwork as outlines only (and back to full preview).
+  GPU Preview | Ctrl+E
+  Overprint Preview | Alt+Shift+Ctrl+Y
+  Pixel Preview | Alt+Ctrl+Y
+  Trim View
+  Proof Colors
+  Zoom In | Ctrl++
+  Zoom Out | Ctrl+-
+  Fit Artboard in Window | Ctrl+0
+  Fit All in Window | Alt+Ctrl+0
+  Actual Size | Ctrl+1
+  Hide Edges|Show Edges | Ctrl+H
+  Hide Artboards|Show Artboards | Shift+Ctrl+H
+  Hide Print Tiling|Show Print Tiling
+  Show Slices|Hide Slices
+  Hide Template|Show Template | Shift+Ctrl+W
+  Hide Live Paint Gaps|Show Live Paint Gaps
+  Hide Gradient Annotator|Show Gradient Annotator | Alt+Ctrl+G
+  Hide Bounding Box|Show Bounding Box | Shift+Ctrl+B
+  Show Transparency Grid|Hide Transparency Grid | Shift+Ctrl+D
+  Hide Text Threads|Show Text Threads | Shift+Ctrl+Y
+  Rulers
+    Show Rulers|Hide Rulers | Ctrl+R
+    Change to Artboard Rulers|Change to Global Rulers | Alt+Ctrl+R
+    Show Video Rulers|Hide Video Rulers
+  Smart Guides | Ctrl+U
+  Perspective Grid
+    Show Grid|Hide Grid | Shift+Ctrl+I
+    Show Rulers|Hide Rulers
+    Snap to Grid
+    Lock Grid
+    Lock Station Point
+    Define Grid...
+    Save Grid as Preset...
+  Guides
+    Hide Guides|Show Guides | Ctrl+;
+    Lock Guides|Unlock Guides | Alt+Ctrl+;
+    Make Guides | Ctrl+5 | s
+    Release Guides | Alt+Ctrl+5
+    Clear Guides
+  Snap to Point | Alt+Ctrl+"
+  Show Grid|Hide Grid | Ctrl+"
+  Snap to Grid | Shift+Ctrl+"
+  New View...
+  Edit Views...
+
+Window
+  New Window
+  Workspace
+    Automation
+    Essentials
+    Essentials Classic
+    Getting Started
+    Layout
+    Painting
+    Printing and Proofing
+    Tracing
+    Typography
+    Web
+    New Workspace...
+    Manage Workspaces...
+  Arrange
+    Cascade
+    Tile
+    Float in Window
+    Float All in Windows
+    Consolidate All Windows
+  Toolbars
+    Basic | | | Switches to the short toolbar with common tools.
+    Advanced | | | Switches to the full toolbar with every tool.
+    New Toolbar...
+    Manage Toolbars...
+  Control
+  Contextual Task Bar
+  3D and Materials
+  Actions
+  Align | Shift+F7 | | Shows or hides the Align panel.
+  Appearance | Shift+F6 | | Shows or hides the Appearance panel.
+  Artboards
+  Asset Export
+  Attributes | Ctrl+F11
+  Brushes | F5
+  Color | F6 | | Shows or hides the Color panel.
+  Color Guide
+  CSS Properties
+  Document Info
+  Flattener Preview
+  Gradient | Ctrl+F9 | | Shows or hides the Gradient panel.
+  Graphic Styles | Shift+F5
+  Image Trace
+  Info | Ctrl+F8
+  Layers | F7 | | Shows or hides the Layers panel.
+  Learn
+  Libraries | | | Shows or hides the CC Libraries panel.
+  Links
+  Magic Wand
+  Navigator
+  Pathfinder | Shift+Ctrl+F9 | | Shows or hides the Pathfinder panel (unite, minus front, intersect...).
+  Pattern Options
+  Properties | | | Shows or hides the Properties panel.
+  Separations Preview
+  Stroke | Ctrl+F10 | | Shows or hides the Stroke panel.
+  SVG Interactivity
+  Swatches | | | Shows or hides the Swatches panel.
+  Symbols | Shift+Ctrl+F11
+  Transform | Shift+F8
+  Transparency | Shift+Ctrl+F10
+  Type
+    Character | Ctrl+T
+    Character Styles
+    Glyphs
+    OpenType | Alt+Shift+Ctrl+T
+    Paragraph | Alt+Ctrl+T
+    Paragraph Styles
+    Tabs | Shift+Ctrl+T
+  Variables
+  Version History
+
+Help
+  Illustrator Help... | F1
+  Support Community
+  Manage My Account...
+  System Info...
+  Updates...
+  About Illustrator...

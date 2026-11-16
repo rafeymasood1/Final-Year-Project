@@ -1,0 +1,9 @@
+{
+  "processes": ["blender.exe"],
+  "canvas_selectors": [],
+  "preserve_selectors": [{"control_type": "ToolBarControl"}, {"control_type": "MenuControl"}, {"control_type": "ButtonControl"}],
+  "minimum_canvas_fraction": 0.08,
+  "canvas_inset_px": 12,
+  "refresh_seconds": 3,
+  "manual_canvas_regions": []
+}

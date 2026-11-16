@@ -1,0 +1,32 @@
+{
+  "app": "illustrator",
+  "id": "meet-the-toolbox",
+  "title": "Meet the toolbox",
+  "goal": "Find three core tools and draw your first line.",
+  "steps": [
+    {
+      "type": "info",
+      "say": "Welcome! In about two minutes you will find three tools in Illustrator's toolbox. Dydact highlights each one on your screen. Click the highlight to continue."
+    },
+    {
+      "type": "do",
+      "target": "selection",
+      "say": "The Selection tool picks and moves whole objects. Click the highlighted tool."
+    },
+    {
+      "type": "do",
+      "target": "pen",
+      "say": "The Pen tool draws precise paths from anchor points. Click the highlighted tool."
+    },
+    {
+      "type": "try",
+      "say": "Now try it: click two different spots on the canvas to draw a straight line. Press 'I did it' when you are done."
+    },
+    {
+      "type": "do",
+      "target": "zoom",
+      "say": "Picking another tool ends the line. The Zoom tool magnifies the view: click the highlighted tool, then click the canvas."
+    }
+  ],
+  "summary": "You found the Selection, Pen and Zoom tools and drew a line. Tip: you can type any tool's name in Query mode and Dydact will show you where it is."
+}

@@ -1,0 +1,19 @@
+{
+  "apps": {
+    "illustrator": {
+      "title": "Adobe Illustrator",
+      "courses": {
+        "basics": {
+          "title": "Basics",
+          "modules": [
+            {
+              "id": "getting_started",
+              "title": "Getting started",
+              "lesson": "basics/getting_started.json"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
